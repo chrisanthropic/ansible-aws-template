@@ -1,0 +1,92 @@
+---
+#######################
+## Set some DEFAULTS ##
+#######################
+
+# Set the name of your stack
+stack: worksforme
+
+# Set what environment you want this tagged with: dev/stage/production
+env: dev
+
+# Set who owns it (your name)
+owner: testasaurus-rex
+
+# Set SSH Keypair to use
+ssh_keypair: "{{ stack }}-key"
+
+## Set base AMI to use
+base_ami: ami-fce3c696
+
+############################
+## Set AWS Region and AZs ##
+############################
+region: us-east-1
+zone1: us-east-1a
+zone2: us-east-1d
+
+#####################
+## Set CIDR Blocks ##
+#####################
+vpc_cidr_block: 10.1.0.0/16
+
+INT_subnet: 10.1.1.0/24
+EXT_subnet: 10.1.2.0/24
+
+##################################################################################################
+#                                           EVERYTHING BELOW HERE GETS LOOPED BY tasks/stack.yml #
+##################################################################################################
+VMs:                                    # Don't edit this line unless you know what you're doing #
+##################################################################################################
+
+####################################
+##### Define Variables for Machine 1
+####################################
+  - name: INT
+    ami: "{{ base_ami }}"
+    instance_type: t2.micro
+    subnetID: "{{ INT_subnet }}"
+
+    ### Firewall rules - INBOUND
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+
+    ### Firewall rules - OUTBOUND
+    rules_egress:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: udp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+
+####################################
+##### Define Variables for MAchine 2
+####################################
+  - name: EXT
+    ami: "{{ base_ami }}"
+    instance_type: t2.micro
+    subnetID: "{{ EXT_subnet }}"
+
+    ### Firewall rules - INBOUND
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+
+    ### Firewall rules - OUTBOUND
+    rules_egress:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: udp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0 

@@ -1,0 +1,24 @@
+---
+############################
+### Create our VPC & Subnets
+############################
+- ec2_vpc:
+    region: "{{ region }}"
+    state: present
+    internet_gateway: true
+    instance_tenancy: default
+    resource_tags: { Name: "{{ stack }}-vpc-{{ env }}", env: "{{ env }}", owner: "{{ owner }}", stack: "{{ stack }}" }
+    cidr_block: "{{ vpc_cidr_block }}"
+    subnets:
+      - cidr: "{{ INT_subnet }}"
+        az: "{{ zone1 }}"
+        resource_tags: { "Name":"sn-INT-{{ stack }}-{{ env }}", env: "{{ env }}", stack: "{{ stack }}", owner: "{{ owner }}" }
+      - cidr: "{{ EXT_subnet }}"
+        az: "{{ zone2 }}"
+        resource_tags: { "Name":"sn-EXT-{{ stack }}-{{ env }}", env: "{{ env }}", event: "{{ stack }}", owner: "{{ owner }}" } 
+  register: vpc
+
+# Define our VPC info as variables
+- set_fact: vpc_id="{{ vpc.vpc_id }}"
+- set_fact: INT_subnet="{{ vpc.subnets[0].id }}"
+- set_fact: EXT_subnet="{{ vpc.subnets[1].id }}"

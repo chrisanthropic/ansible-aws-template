@@ -1,0 +1,49 @@
+---
+# The tasks below loop through whatever is defined under "VMs" in the config.yml!
+
+# Define the Security Group
+- ec2_group:
+      description: Security group for our machines
+      name: "sg_{{ stack }}_VM_{{ item.name }}_{{ env }}"
+      region: "{{ region }}"
+      vpc_id: "{{ vpc_id }}"
+      rules: "{{ item.rules }}"
+      rules_egress: "{{ item.rules_egress }}"
+      state: present
+  with_items: VMs
+  register: sg_id
+
+# Create VM in EC2 and add it to an existing subnet
+- ec2:
+    key_name: "{{ ssh_keypair }}"
+    instance_type: "{{ item.instance_type }}"
+    image: "{{ item.ami }}"
+    region: "{{ region }}"
+    group: "sg_{{ stack }}_VM_{{ item.name }}_{{ env }}"
+    vpc_subnet_id: "{{ item.subnetID }}"
+    assign_public_ip: yes
+    state: present
+    instance_tags:
+      Name: "{{ stack }}_VM_{{ item.name }}_{{ env }}"
+      env: "{{ env }}"
+      event: "{{ stack }}"
+      owner: "{{ owner }}"
+  with_items: VMs
+ 
+# Get the IDs of every SecurityGroup that matches our event and environment
+# This query needs to write all of them to a single stdout so that we can simply iterate through them in the next step.
+- shell: aws ec2 describe-instances --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' --filter Name=tag:Name,Values="{{ stack }}"_VM_*_"{{ env }}" --output text | uniq
+  with_items: VMs
+  register: groupIDs
+
+# Add tags to the Security Group
+- ec2_tag:
+      resource: "{{ item }}"
+      region: "{{ region }}"
+      state: present
+      tags:
+        Name: "sg_{{ stack }}_VM_{{ env }}"
+        env: "{{ env }}"
+        event: "{{ stack }}"
+        owner: "{{ owner }}"
+  with_items: groupIDs.results[0].stdout_lines

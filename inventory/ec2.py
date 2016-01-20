@@ -1324,4 +1324,3 @@ class Ec2Inventory(object):
 
 # Run the script
 Ec2Inventory()
-

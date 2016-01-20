@@ -1,0 +1,18 @@
+---
+# Check if key already exists
+- stat:
+    path: ~/.ssh/id_rsa.pub
+  register: sshkey
+
+# If key doesn't exist, create it
+- user:
+    name: "{{ owner }}"
+    generate_ssh_key: yes 
+    ssh_key_bits: 2048
+  when: sshkey.stat.exists == False
+
+# Register the key with AWS EC2
+- ec2_key:
+    region: "{{ region }}"
+    name: "{{ stack }}-key"
+  with_file:  ~/.ssh/id_rsa.pub  
