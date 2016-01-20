@@ -3,9 +3,6 @@ A barebones setup for an Ansible project to manage AWS instances using Ansible's
 
 It assumes you have an AWS account with SSH passwords disabled and .pem logins allowed only.
 
-Running this will create the following resources:
-- 
-
 ## HOW
 - Git clone this repo.
 - Export your AWS keys (or add the commands to your .profile or .bashrc)
@@ -19,7 +16,6 @@ Running this script will create the following resources on your AWS account and 
 
 RESOURCES:
 - 1 local ssh key; ~/.ssh/id_rsa (if it doesn't exist)
-
 - 1 VPC
 - 1 VPC Internet Gateway
 - 2 subnets
