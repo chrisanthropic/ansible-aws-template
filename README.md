@@ -1,7 +1,5 @@
 ## WHAT
-A barebones setup for an Ansible project to manage AWS instances using Ansible's "Dynamic Inventory" script, and is only meant to get you started with Ansible and able to communicate between your local machine and your AWS account.
-
-It assumes you have an AWS account with SSH passwords disabled and .pem logins allowed only.
+A barebones setup for an Ansible project to manage AWS instances using Ansible's "Dynamic Inventory" script, and is only meant to get you started with Ansible and AWS.
 
 ## HOW
 - Git clone this repo.
@@ -16,6 +14,7 @@ Running this script will create the following resources on your AWS account and 
 
 RESOURCES:
 - 1 local ssh key; ~/.ssh/id_rsa (if it doesn't exist)
+
 - 1 VPC
 - 1 VPC Internet Gateway
 - 2 subnets
